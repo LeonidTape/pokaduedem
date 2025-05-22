@@ -1,23 +1,23 @@
 const tracks = [
   {
     title: "Rack - Towa, ELVEN DIOR",
-    src: "music/track2.mp3",
-    cover: "img/1.jpg"
+    src: "../music/track2.mp3",
+    cover: "../img/1.jpg"
   },
   {
     title: "SLAUGHTER - SAURXN, HUNTERPLAYA",
-    src: "music/track1.mp3",
-    cover: "img/2.png"
+    src: "../music/track1.mp3",
+    cover: "../img/2.png"
   },
   {
     title: "Scopin - Kordhell",
-    src: "music/track3.mp3",
-    cover: "img/3.jpg"
+    src: "../music/track3.mp3",
+    cover: "../img/3.jpg"
   },
   {
     title: "METAMORPHOSIS - INTERWORLD",
-    src: "music/track4.mp3",
-    cover: "img/4.jpg"
+    src: "../music/track4.mp3",
+    cover: "../img/4.jpg"
   }
 ];
 
