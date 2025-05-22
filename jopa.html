@@ -39,36 +39,80 @@
     #continue-btn:hover { background: linear-gradient(90deg, #48e0fe, #2b6cff); box-shadow: 0 8px 32px #1a2a7f30; }
     #countdown-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem; color: #fff; z-index: 150; display: none; pointer-events: none; user-select: none; text-shadow: 0 2px 20px #000, 0 4px 40px #000; }
     /* --------- Кастомизация --------- */
- #open-custom-menu {
-  position: relative;
-  z-index: 210 !important;
-  pointer-events: auto !important;
-  display: block;
-  margin: 12px 0 0 0;
-}
-#custom-menu {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  z-index: 3000 !important;
-  background: #23244e;
-  border-radius: 18px;
-  box-shadow: 0 8px 40px #000a;
-  padding: 24px 30px;
-  display: block; /* ← ВЕРНУТЬ! */
-  min-width: 260px;
-  max-width: 95vw;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-#custom-menu-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.45);
-  z-index: 2999;
-  display: flex;
-}
+    #open-custom-menu {
+      position: relative;
+      z-index: 210 !important;
+      pointer-events: auto !important;
+      display: block;
+      margin: 12px 0 0 0;
+      font-family: 'Montserrat', sans-serif;
+    }
+    #custom-menu {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3000;
+      background: #23244e;
+      border-radius: 18px;
+      box-shadow: 0 8px 40px #000a;
+      padding: 24px;
+      display: none;
+      flex-direction: column;
+      width: 700px;
+      max-width: 95vw;
+      height: 90vh;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+    /* Контейнер контента делим на две части */
+    #custom-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+    /* Блок превью */
+    #preview-container {
+      flex: 0 0 280px;
+      margin-right: 20px;
+    }
+    #custom-car-preview {
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+    }
+    /* Блок полей и кнопки */
+    #fields-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    /* Поля кастомизации */
+    .custom-fields {
+      flex: 1;
+    }
+    /* Кнопка сохранить прижата вниз */
+    #custom-save-btn {
+      margin-top: 16px;
+      align-self: flex-end;
+    }
+    /* Скрываем скроллбар в preview */
+    #preview-container::-webkit-scrollbar {
+      display: none;
+    }
+    /* Стили скроллбара полей */
+    #fields-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    #fields-container::-webkit-scrollbar-track {
+      background: #1b1c3e;
+      border-radius: 4px;
+    }
+    #fields-container::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+    }
 
     #custom-menu h2 { margin:0 0 1em 0; font-size:1.4em; text-align:center; font-weight:700; font-family: 'Montserrat'; }
     .custom-field { margin-bottom: 1.3em; display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
@@ -563,6 +607,7 @@ for(let i=0;i<NUM_S;i+=4){
       previewScene.add(previewCar);
     }
     function showCustomMenu() {
+      customMenu.style.display = 'flex';
       colorBodyInput.value = carCustom.colorBody;
       colorCabInput.value = carCustom.colorCab;
       colorWheelsInput.value = carCustom.colorWheels;
@@ -581,7 +626,9 @@ for(let i=0;i<NUM_S;i+=4){
       customMenu.style.display = "flex";
       if (!previewScene) initPreview(); else updatePreview();
     }
-    function hideCustomMenu() { customMenu.style.display = "none"; }
+    function hideCustomMenu() {
+      customMenu.style.display = 'none';
+    }
     function getCustomFromInputs() {
   return {
     carFlagType: carFlagTypeInput.value,
@@ -599,20 +646,23 @@ for(let i=0;i<NUM_S;i+=4){
   };
 }
 openCustomBtn.addEventListener('click', e => {
-  e.stopPropagation();
-  if (!isPaused) {
-    pauseGame();
-    // !!! Дай паузе отобразиться, а потом открывай меню (через setTimeout)
-    setTimeout(showCustomMenu, 0);
-  } else {
-    showCustomMenu();
-  }
-});
+      e.stopPropagation();
+      pauseGame(); // если нужно ставить игру на паузу
+      setTimeout(showCustomMenu, 0);
+    });
+    customCloseBtn.addEventListener('click', hideCustomMenu);
 
 bodyLengthInput.addEventListener('input', () => {
   bodyLengthValue.textContent = bodyLengthInput.value;
   updatePreview();
 });
+
+    document.addEventListener('click', e => {
+      if (customMenu.style.display === 'flex' && !customMenu.contains(e.target) && e.target !== openCustomBtn) {
+        hideCustomMenu();
+      }
+    });
+
 cabLengthInput.addEventListener('input', () => {
   cabLengthValue.textContent = cabLengthInput.value;
   updatePreview();
