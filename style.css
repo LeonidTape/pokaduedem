@@ -1,0 +1,185 @@
+html, body, #__xYzGameWrapper { margin:0; padding:0; width:100%; height:100%; }
+    body { background:#000022; overflow:hidden; }
+    #hud, #leaderboard, #game-over, #pause-menu, #pause-menu * { font-family: 'Montserrat', sans-serif; color:#fff; }
+    #__xYzGameWrapper { position:relative; }
+    #gameCanvas { position:absolute; top:0; left:0; width:100%; height:100%; }
+    #hud { position:absolute; top:10px; left:10px; font-size:1.2rem; z-index:5; }
+    #leaderboard { position:absolute; top:10px; right:10px; padding:10px; background:rgba(0,0,0,0.7); border-radius:6px; font-size:0.9rem; z-index:5; }
+    #leaderboard h2 { margin:0 0 0.5rem; font-size:1rem; text-align:center; }
+    #leaderboard table { width:100%; border-collapse:collapse; }
+    #leaderboard th, #leaderboard td { padding:4px; text-align:center; border-bottom:1px solid #555; }
+    #game-over { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:2rem; text-align:center; display:none; z-index:101; color:#ff4444; }
+    #game-over span { display:block; margin-top:1rem; font-size:1rem; color:#fff; cursor:pointer; }
+    #brake-bar, #nitro-bar, #health-bar { position:absolute; left:50%; transform:translateX(-50%); width:200px; height:10px; border-radius:5px; overflow:hidden; z-index:5; }
+    #brake-bar { bottom:20px; border:1px solid #fff; }
+    #health-bar { bottom:6px; border:1px solid #88ff88; }
+    #nitro-bar { bottom:40px; border:1px solid #40E0D0; visibility:hidden; }
+    #brake-fill { width:0%; height:100%; background:#fff; }
+    #nitro-fill { width:0%; height:100%; background:#40E0D0; }
+    #health-fill { width:100%; height:100%; background:#44ff44; transition:background 0.2s; }
+    #pause-menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: transparent !important; z-index: 100; display: none; pointer-events: all; }
+    #pause-menu-content { width:100vw; height:100vh; position:relative; display:flex; flex-direction:row; align-items:flex-start; justify-content:space-between; pointer-events: none; }
+    #pause-info { position: absolute; top: 20px; left: 20px; background: #1b1c39; border-radius: 5px; padding: 10px 18px 10px 12px; box-shadow: 0 0 8px #0008; pointer-events: auto; min-width: 220px; z-index: 1; }
+    #pause-nick { font-size: 1.1rem; border: none; outline: none; background: #223; color: #fff; padding: 5px 12px; border-radius: 3px; width: 120px; transition: background 0.2s; }
+    #pause-nick:focus { background: #334; }
+    #personal-record { margin-top: 8px; font-size: 0.9rem; }
+    #pause-instructions { position: absolute; top: 30px; right: 40px; background: #fff; color: #000; border-radius: 10px; padding: 22px 30px; min-width: 260px; max-width: 320px; box-shadow: 0 4px 20px #0002; font-size: 1.03rem; font-weight: 400; text-align: left; z-index: 2; pointer-events: auto; border:1px solid #eee; display: flex; flex-direction: column; gap: 0.7em; }
+    #pause-instructions h3 { margin-top:0; margin-bottom:0.6em; font-size:1.18em; color:#000; }
+    #pause-instructions ul { margin:0.2em 0 0 1.1em; padding:0; font-size:1em; color: black; }
+    #pause-instructions li { margin-bottom:0.3em; color: black; }
+    #continue-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 36px; font-size: 1.3rem; font-weight: 700; background: linear-gradient(90deg, #2b6cff, #48e0fe); color: #fff; border: none; border-radius: 7px; box-shadow: 0 4px 20px #1a2a7f30; cursor: pointer; transition: background 0.2s, box-shadow 0.1s; pointer-events: auto; z-index: 3; }
+    #continue-btn:hover { background: linear-gradient(90deg, #48e0fe, #2b6cff); box-shadow: 0 8px 32px #1a2a7f30; }
+    #countdown-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem; color: #fff; z-index: 150; display: none; pointer-events: none; user-select: none; text-shadow: 0 2px 20px #000, 0 4px 40px #000; }
+    /* --------- Кастомизация --------- */
+    #open-custom-menu {
+      position: relative;
+      z-index: 210 !important;
+      pointer-events: auto !important;
+      display: block;
+      margin: 12px 0 0 0;
+      font-family: 'Montserrat', sans-serif;
+    }
+    #custom-menu {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3000;
+      background: #23244e;
+      border-radius: 18px;
+      box-shadow: 0 8px 40px #000a;
+      padding: 24px;
+      display: none;
+      flex-direction: column;
+      width: 900px;
+      height: 90vh;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+      font-size: large;
+      color: white;
+    }
+    /* Контейнер контента делим на две части */
+    #custom-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+    /* Блок превью */
+    #preview-container {
+      flex: 0 0 280px;
+      margin-right: 20px;
+    }
+    #custom-car-preview {
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+    }
+    /* Блок полей и кнопки */
+    #fields-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    /* Поля кастомизации */
+    .custom-fields {
+      flex: 1;
+    }
+    /* Кнопка сохранить прижата вниз */
+    #custom-save-btn {
+      margin-top: 16px;
+      align-self: flex-end;
+    }
+    /* Скрываем скроллбар в preview */
+    #preview-container::-webkit-scrollbar {
+      display: none;
+    }
+    /* Стили скроллбара полей */
+    #fields-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    #fields-container::-webkit-scrollbar-track {
+      background: #1b1c3e;
+      border-radius: 4px;
+    }
+    #fields-container::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+    }
+
+    #custom-content {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  gap: 24px;
+}
+
+#preview-container {
+  flex: 0 0 440px;   /* было 280px, теперь 440px */
+  min-width: 340px;
+  max-width: 600px;
+  height: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #21244a;
+  border-radius: 7px;
+  height: 850px;     /* было 320px, теперь 440px */
+  margin-right: 0;
+}
+
+#custom-car-preview {
+  width: 100%;
+  height: 400px;     /* увеличьте высоту канваса */
+  background: transparent;
+}
+
+#fields-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+    #custom-menu h2 { margin:0 0 1em 0; font-size:1.4em; text-align:center; font-weight:700; font-family: 'Montserrat'; }
+    .custom-field { margin-bottom: 1.3em; display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
+    .custom-field label { margin-bottom: 0.2em; font-size: 1em; font-weight: 600; }
+    .custom-color { display: flex; align-items: center; gap: 0.7em; }
+    .custom-color input[type="color"] { width: 38px; height: 38px; border: none; border-radius: 6px; background: #fff; padding:0; }
+    .custom-select { font-size: 1em; padding: 5px 12px; border-radius: 5px; border: none; background: #223; color: #fff; outline: none; }
+    #custom-save-btn { padding: 10px 40px; border: none; border-radius: 7px; background: linear-gradient(90deg, #4ed1ff, #8cffd9); color: #111; font-size: 1.18em; font-family: 'Montserrat'; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px #1a2a7f30; margin-top: 10px; }
+    #custom-close-btn { background: none; border: none; color: #aaa; font-family: 'Montserrat'; font-size: 1.9em; position: absolute; right: 20px; top: 10px; cursor: pointer; transition: color .14s; }
+    #custom-close-btn:hover { color: #fff; }
+    #custom-car-preview { width: 100%; height: 140px; background: #21244a; margin-bottom:1.2em; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+    #countdown-overlay {font-family: 'Montserrat';}
+    @media (max-width:600px) { #pause-instructions { display:none !important; } #custom-menu { min-width: 90vw; padding: 5vw 2vw 2vw 2vw; } }
+  
+#music-player {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 2000;
+  background: rgba(34, 34, 34, 0.55);
+  padding: 14px 18px;
+  border-radius: 14px;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  box-shadow: 0 2px 20px #000a;
+  min-width: 180px;
+  max-width: 320px;
+  width: auto;
+  backdrop-filter: blur(12px) saturate(1.5);
+  -webkit-backdrop-filter: blur(12px) saturate(1.5);
+  border: 1.4px solid rgba(255,255,255,0.12);
+}
+#music-player button { font-size: 1em; }
+#music-player audio { width: 100%; display: none; }
+#music-player img.cover {
+  display: block;
+  width: 72px; height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 0 auto 10px auto;
+  box-shadow: 0 4px 16px #0005;
+}
