@@ -47,13 +47,27 @@
   margin: 12px 0 0 0;
 }
 #custom-menu {
-  z-index: 200 !important;
-  max-width: 380px;
-  min-width: 220px;
-  width: 95vw;
-  box-sizing: border-box;
-  overflow-x: auto;
-  display: none;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 3000 !important;
+  background: #23244e;
+  border-radius: 18px;
+  box-shadow: 0 8px 40px #000a;
+  padding: 24px 30px;
+  display: block; /* ← ВЕРНУТЬ! */
+  min-width: 260px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+#custom-menu-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.45);
+  z-index: 2999;
+  display: flex;
 }
 
     #custom-menu h2 { margin:0 0 1em 0; font-size:1.4em; text-align:center; font-weight:700; font-family: 'Montserrat'; }
