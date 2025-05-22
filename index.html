@@ -837,55 +837,114 @@ if (custom.carFlagType !== "none") {
   flag.userData.isFlag = true;
   car.add(flag);
 }
-
 if (custom.tsurikawaType !== "none") {
   let shape;
-  if (custom.tsurikawaType === "circle")
-    shape = new THREE.TorusGeometry(0.14, 0.035, 12, 24);
-  else if (custom.tsurikawaType === "heart")
-    shape = new THREE.TorusKnotGeometry(0.11, 0.03, 32, 6, 2, 3);
-  else if (custom.tsurikawaType === "star")
-    shape = new THREE.TorusGeometry(0.18, 0.03, 5, 12);
+if (custom.tsurikawaType === "circle")
+  shape = new THREE.RingGeometry(0.10, 0.17, 32);
+else if (custom.tsurikawaType === "heart") {
+  // Контур сердца
+  const x = 0, y = 0;
+  const heartShape = new THREE.Shape();
+  heartShape.moveTo(x, y + 0.10);
+  heartShape.bezierCurveTo(x, y + 0.18, x - 0.14, y + 0.18, x - 0.14, y + 0.10);
+  heartShape.bezierCurveTo(x - 0.14, y - 0.08, x, y - 0.16, x, y - 0.02);
+  heartShape.bezierCurveTo(x, y - 0.16, x + 0.14, y - 0.08, x + 0.14, y + 0.10);
+  heartShape.bezierCurveTo(x + 0.14, y + 0.18, x, y + 0.18, x, y + 0.10);
+
+  // Внутреннее отверстие ("дырка")
+  const hole = new THREE.Path();
+  hole.moveTo(x, y + 0.09);
+  hole.bezierCurveTo(x, y + 0.13, x - 0.10, y + 0.13, x - 0.10, y + 0.09);
+  hole.bezierCurveTo(x - 0.10, y - 0.03, x, y - 0.08, x, y - 0.01);
+  hole.bezierCurveTo(x, y - 0.08, x + 0.10, y - 0.03, x + 0.10, y + 0.09);
+  hole.bezierCurveTo(x + 0.10, y + 0.13, x, y + 0.13, x, y + 0.09);
+  heartShape.holes.push(hole);
+
+  shape = new THREE.ExtrudeGeometry(heartShape, {
+    depth: 0.05,
+    bevelEnabled: true,
+    bevelThickness: 0.018,
+    bevelSize: 0.012,
+    bevelSegments: 2
+  });
+}
+else if (custom.tsurikawaType === "star") {
+  function createStarShape(points = 5, rOuter = 0.17, rInner = 0.08) {
+    const shape = new THREE.Shape();
+    const step = Math.PI / points;
+    for (let i = 0; i < points * 2; i++) {
+      const radius = i % 2 === 0 ? rOuter : rInner;
+      const angle = i * step - Math.PI / 2;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      if (i === 0) shape.moveTo(x, y);
+      else shape.lineTo(x, y);
+    }
+    shape.closePath();
+
+    // Внутренняя звезда-дырка
+    const hole = new THREE.Path();
+    for (let i = 0; i < points * 2; i++) {
+      const r = i % 2 === 0 ? rOuter * 0.55 : rInner * 0.55;
+      const angle = i * step - Math.PI / 2;
+      const x = Math.cos(angle) * r;
+      const y = Math.sin(angle) * r;
+      if (i === 0) hole.moveTo(x, y);
+      else hole.lineTo(x, y);
+    }
+    hole.closePath();
+    shape.holes.push(hole);
+
+    return shape;
+  }
+  const starShape = createStarShape(5, 0.17, 0.08);
+  shape = new THREE.ExtrudeGeometry(starShape, {
+    depth: 0.05,
+    bevelEnabled: true,
+    bevelThickness: 0.018,
+    bevelSize: 0.012,
+    bevelSegments: 2
+  });
+}
 
   const tsMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(custom.tsurikawaColor) });
   const ts = new THREE.Mesh(shape, tsMat);
-  ts.position.set(0, 0.5, -halfBody - 0.27);
+  ts.position.set(-1.13, 0.5, -halfBody - 0.27);
   ts.userData.isTsurikawa = true;
   car.add(ts);
 }
 
 if (custom.plateText && custom.plateText.length > 0) {
-  // Белая пластина номера (опционально, для контраста)
-  const plate = new THREE.Mesh(
-    new THREE.BoxGeometry(0.7, 0.22, 0.04),
-    new THREE.MeshPhongMaterial({ color: 0xffffff })
-  );
-  plate.position.set(0, 0.8, -halfBody - 0.05);
-  car.add(plate);
-
-  // Текстура с номером
+  // Canvas-текстура для текста номера
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 64;
+  canvas.width = 128; canvas.height = 32;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = "#000";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#000";
-  ctx.font = "bold 44px monospace";
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, 128, 32);
+  ctx.fillStyle = "#222";
+  ctx.font = "bold 24px monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(custom.plateText, canvas.width/2, canvas.height/2);
+  ctx.fillText(custom.plateText, 64, 16);
+  ctx.font = "bold 28px monospace";
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
   const textMat = new THREE.MeshBasicMaterial({ map: texture, transparent:true });
-
-  // Сам текст как PlaneGeometry, чуть перед пластиной
   const textPlane = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.66, 0.18),
+    new THREE.PlaneGeometry(0.58, 0.15),
     textMat
   );
-  textPlane.position.set(0, 0.8, -halfBody - 0.072); // чуть дальше наружу, чтобы не было Z-fighting
+  textPlane.position.set(0, 0.8, -halfBody - 0.01); // чуть ближе к камере!
+
+  // Белая пластина чуть дальше (чтобы текст не перекрывался)
+  const plate = new THREE.Mesh(
+    new THREE.BoxGeometry(0.6, 0.18, 0.03),
+    new THREE.MeshPhongMaterial({ color: 0xffffff })
+  );
+  plate.position.set(0, 0.8, -halfBody - 0.04);
+
+  car.add(plate);
   car.add(textPlane);
 }
 
