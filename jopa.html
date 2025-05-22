@@ -584,10 +584,15 @@ for(let i=0;i<NUM_S;i+=4){
     cabLength: parseFloat(cabLengthInput.value),
   };
 }
-    openCustomBtn.addEventListener('click', e => {
+openCustomBtn.addEventListener('click', e => {
   e.stopPropagation();
-  if (!isPaused) pauseGame();
-  showCustomMenu();
+  if (!isPaused) {
+    pauseGame();
+    // !!! Дай паузе отобразиться, а потом открывай меню (через setTimeout)
+    setTimeout(showCustomMenu, 0);
+  } else {
+    showCustomMenu();
+  }
 });
 
 bodyLengthInput.addEventListener('input', () => {
@@ -599,17 +604,12 @@ cabLengthInput.addEventListener('input', () => {
   updatePreview();
 });
     customCloseBtn.addEventListener('click', hideCustomMenu);
-    [
-      colorBodyInput, colorCabInput, colorWheelsInput, spoilerTypeInput,
-      carFlagColorInput, carFlagTypeInput,
-      tsurikawaColorInput, tsurikawaTypeInput,
-      plateTextInput
-    ].forEach(input => input.addEventListener('input', updatePreview));
+    [colorBodyInput, colorCabInput, colorWheelsInput, spoilerTypeInput, carFlagColorInput, carFlagTypeInput, tsurikawaColorInput, tsurikawaTypeInput, plateTextInput].forEach(input => input.addEventListener('input', updatePreview));
     customSaveBtn.addEventListener('click', () => {
       carCustom = getCustomFromInputs();
       saveCustom(carCustom);
-      hideCustomMenu();
       restart();
+      hideCustomMenu();
       pauseGame();
     });
 
