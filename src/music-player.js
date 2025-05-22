@@ -1,23 +1,23 @@
 const tracks = [
   {
     title: "Rack - Towa, ELVEN DIOR",
-    src: "pokaduedem/music/track2.mp3",
-    cover: "pokaduedem/img/1.jpg"
+    src: "https://leonidtape.github.io/pokaduedem/music/track2.mp3",
+    cover: "https://leonidtape.github.io/pokaduedem/img/1.jpg"
   },
   {
     title: "SLAUGHTER - SAURXN, HUNTERPLAYA",
-    src: "pokaduedem/music/track1.mp3",
-    cover: "pokaduedem/img/2.png"
+    src: "https://leonidtape.github.io/pokaduedem/music/track1.mp3",
+    cover: "https://leonidtape.github.io/pokaduedem/img/2.png"
   },
   {
     title: "Scopin - Kordhell",
-    src: "pokaduedem/music/track3.mp3",
-    cover: "pokaduedem/img/3.jpg"
+    src: "https://leonidtape.github.io/pokaduedem/music/track3.mp3",
+    cover: "https://leonidtape.github.io/pokaduedem/img/3.jpg"
   },
   {
     title: "METAMORPHOSIS - INTERWORLD",
-    src: "pokaduedem/music/track4.mp3",
-    cover: "pokaduedem/img/4.jpg"
+    src: "https://leonidtape.github.io/pokaduedem/music/track4.mp3",
+    cover: "https://leonidtape.github.io/pokaduedem/img/4.jpg"
   }
 ];
 
