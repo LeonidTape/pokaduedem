@@ -58,11 +58,12 @@
       padding: 24px;
       display: none;
       flex-direction: column;
-      width: 700px;
-      max-width: 95vw;
+      width: 900px;
       height: 90vh;
       box-sizing: border-box;
       font-family: 'Montserrat', sans-serif;
+      font-size: large;
+      color: white;
     }
     /* Контейнер контента делим на две части */
     #custom-content {
@@ -113,6 +114,41 @@
       background: #555;
       border-radius: 4px;
     }
+
+    #custom-content {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  gap: 24px;
+}
+
+#preview-container {
+  flex: 0 0 440px;   /* было 280px, теперь 440px */
+  min-width: 340px;
+  max-width: 600px;
+  height: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #21244a;
+  border-radius: 7px;
+  height: 850px;     /* было 320px, теперь 440px */
+  margin-right: 0;
+}
+
+#custom-car-preview {
+  width: 100%;
+  height: 400px;     /* увеличьте высоту канваса */
+  background: transparent;
+}
+
+#fields-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
 
     #custom-menu h2 { margin:0 0 1em 0; font-size:1.4em; text-align:center; font-weight:700; font-family: 'Montserrat'; }
     .custom-field { margin-bottom: 1.3em; display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
@@ -201,71 +237,79 @@
       </div>
     </div>
     <div id="countdown-overlay"></div>
-    <div id="custom-menu">
-        <button id="custom-close-btn" title="Закрыть">&times;</button>
-        <h2>Кастомизация машины</h2>
-        <div id="custom-car-preview"></div>
-        <div class="custom-field">
-          <label for="color-body">Цвет кузова:</label>
-          <div class="custom-color"><input type="color" id="color-body"></div>
-        </div>
-        <div class="custom-field">
-          <label for="color-cab">Цвет стекол:</label>
-          <div class="custom-color"><input type="color" id="color-cab"></div>
-        </div>
-        <div class="custom-field">
-          <label for="color-wheels">Цвет колес:</label>
-          <div class="custom-color"><input type="color" id="color-wheels"></div>
-        </div>
-        <div class="custom-field">
-          <label for="wheel-camber">Развал колес (градусы):</label>
-          <input type="range" id="wheel-camber" min="-15" max="15" step="1">
-          <span id="wheel-camber-value"></span>
-        </div>
-        <div class="custom-field">
-          <label for="spoiler-type">Тип спойлера:</label>
-          <select class="custom-select" id="spoiler-type">
-            <option value="classic">Классический</option>
-            <option value="none">Без спойлера</option>
-            <option value="big">Большой</option>
-            <option value="double">Двойной</option>
-          </select>
-        </div>
-        <div class="custom-field">
-  <label for="car-flag-color">Цвет флажка:</label>
-  <input type="color" id="car-flag-color" value="#ff0000" style="width:38px;">
-  <select class="custom-select" id="car-flag-type" style="margin-left:8px;">
-    <option value="none">Нет</option>
-    <option value="solid">Обычный</option>
-    <option value="checkered">Клетчатый</option>
-  </select>
-</div>
-<div class="custom-field">
-  <label for="tsurikawa-color">Цвет цурикавы:</label>
-  <input type="color" id="tsurikawa-color" value="#ffffff" style="width:38px;">
-  <select class="custom-select" id="tsurikawa-type" style="margin-left:8px;">
-    <option value="none">Нет</option>
-    <option value="circle">Круглая</option>
-    <option value="star">Звездочка</option>
-    <option value="heart">Сердечко</option>
-  </select>
-</div>
-<div class="custom-field">
-  <label for="plate-text">Номер (до 6 символов):</label>
-  <input type="text" id="plate-text" maxlength="6" style="width:90px;">
-</div>
-        <div class="custom-field">
-          <label for="body-length">Длина кузова:</label>
-          <input type="range" id="body-length" min="3" max="8" step="0.1">
-          <span id="body-length-value"></span>
-        </div>
-        <div class="custom-field">
-          <label for="cab-length">Длина кабины:</label>
-          <input type="range" id="cab-length" min="2" max="5" step="0.1">
-          <span id="cab-length-value"></span>
-        </div>
-        <button id="custom-save-btn">Сохранить</button>
+<div id="custom-menu">
+  <button id="custom-close-btn" title="Закрыть">&times;</button>
+  <h2>Кастомизация машины</h2>
+  <div id="custom-content">
+    <!-- Левая колонка: миниатюра -->
+    <div id="preview-container">
+      <div id="custom-car-preview"></div>
+    </div>
+    <!-- Правая колонка: поля и кнопка -->
+    <div id="fields-container">
+      <div class="custom-field">
+        <label for="color-body">Цвет кузова:</label>
+        <div class="custom-color"><input type="color" id="color-body"></div>
       </div>
+      <div class="custom-field">
+        <label for="color-cab">Цвет стекол:</label>
+        <div class="custom-color"><input type="color" id="color-cab"></div>
+      </div>
+      <div class="custom-field">
+        <label for="color-wheels">Цвет колес:</label>
+        <div class="custom-color"><input type="color" id="color-wheels"></div>
+      </div>
+      <div class="custom-field">
+        <label for="wheel-camber">Развал колес (градусы):</label>
+        <input type="range" id="wheel-camber" min="-15" max="15" step="1">
+        <span id="wheel-camber-value"></span>
+      </div>
+      <div class="custom-field">
+        <label for="spoiler-type">Тип спойлера:</label>
+        <select class="custom-select" id="spoiler-type">
+          <option value="classic">Классический</option>
+          <option value="none">Без спойлера</option>
+          <option value="big">Большой</option>
+          <option value="double">Двойной</option>
+        </select>
+      </div>
+      <div class="custom-field">
+        <label for="car-flag-color">Цвет флажка:</label>
+        <input type="color" id="car-flag-color" value="#ff0000" style="width:38px;">
+        <select class="custom-select" id="car-flag-type" style="margin-left:8px;">
+          <option value="none">Нет</option>
+          <option value="solid">Обычный</option>
+          <option value="checkered">Клетчатый</option>
+        </select>
+      </div>
+      <div class="custom-field">
+        <label for="tsurikawa-color">Цвет цурикавы:</label>
+        <input type="color" id="tsurikawa-color" value="#ffffff" style="width:38px;">
+        <select class="custom-select" id="tsurikawa-type" style="margin-left:8px;">
+          <option value="none">Нет</option>
+          <option value="circle">Круглая</option>
+          <option value="star">Звездочка</option>
+          <option value="heart">Сердечко</option>
+        </select>
+      </div>
+      <div class="custom-field">
+        <label for="plate-text">Номер (до 6 символов):</label>
+        <input type="text" id="plate-text" maxlength="6" style="width:90px;">
+      </div>
+      <div class="custom-field">
+        <label for="body-length">Длина кузова:</label>
+        <input type="range" id="body-length" min="3" max="8" step="0.1">
+        <span id="body-length-value"></span>
+      </div>
+      <div class="custom-field">
+        <label for="cab-length">Длина кабины:</label>
+        <input type="range" id="cab-length" min="2" max="5" step="0.1">
+        <span id="cab-length-value"></span>
+      </div>
+      <button id="custom-save-btn">Сохранить</button>
+    </div>
+  </div>
+</div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -561,7 +605,7 @@ for(let i=0;i<NUM_S;i+=4){
     function initPreview() {
       previewScene = new THREE.Scene();
       previewCamera = new THREE.PerspectiveCamera(50, carPreviewDiv.offsetWidth/carPreviewDiv.offsetHeight, 0.1, 100);
-      previewCamera.position.set(0,3,11);
+      previewCamera.position.set(0,2,7);
       previewRenderer = new THREE.WebGLRenderer({ alpha: true, antialias:true });
       previewRenderer.setSize(carPreviewDiv.offsetWidth, carPreviewDiv.offsetHeight);
       carPreviewDiv.innerHTML = "";
@@ -575,10 +619,28 @@ for(let i=0;i<NUM_S;i+=4){
       previewAnimate();
     }
     function previewAnimate() {
-  if (previewCar) previewCar.rotation.y += 0.018;
+  // if (previewCar) previewCar.rotation.y += 0.018;
   previewRenderer.render(previewScene, previewCamera);
   requestAnimationFrame(previewAnimate);
   if (previewCar) {
+    let isDraggingPreview = false;
+let lastPreviewX = 0;
+carPreviewDiv.addEventListener('mousedown', function(e) {
+  isDraggingPreview = true;
+  lastPreviewX = e.clientX;
+});
+
+document.addEventListener('mousemove', function(e) {
+  if (isDraggingPreview && previewCar) {
+    const dx = e.clientX - lastPreviewX;
+    previewCar.rotation.y += dx * 0.00004;
+    lastPreviewX = e.clientX;
+  }
+});
+
+document.addEventListener('mouseup', function(e) {
+  isDraggingPreview = false;
+});
     previewCar.children.forEach(obj => {
       // ФИЗИКА ФЛАГА
       if(obj.userData.isFlag && obj.geometry instanceof THREE.PlaneGeometry){
@@ -707,43 +769,71 @@ const wheelPositions = [
   [ 1.4, 0.5, -halfBody + 1], // заднее правое
 ];
 
-    if (custom.carFlagType !== "none") {
-  // Палка
+    // Координаты трёх вершин треугольника (у основания машины слева, у основания машины справа, вершина "на ветру")
+const triW = 0.55; // ширина у палки
+const triH = 0.36; // высота флага
+
+const positions = new Float32Array([
+  0, 0, 0,                 // у палки, низ
+  0, triH, 0,              // у палки, верх
+  triW, triH/2, 0.09       // вершина на ветру, чуть вперёд по Z (волна)
+]);
+const indices = [0, 1, 2];
+const flagGeo = new THREE.BufferGeometry();
+flagGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+flagGeo.setIndex(indices);
+flagGeo.computeVertexNormals();
+// Передняя часть кузова (там же где передние колёса, но чуть выше)
+const frontZ = halfBody - 0.18;
+const flagBaseX = -1.26;  // чуть левее центра
+const flagBaseY = 1.35;   // чуть выше капота
+if (custom.carFlagType !== "none") {
+  // Палка флага
   const stick = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.04, 0.04, 1.2, 6),
+    new THREE.CylinderGeometry(0.04, 0.04, 0.9, 12),
     new THREE.MeshPhongMaterial({ color: 0xaaaaaa })
   );
-  stick.position.set(-1.35, 1.7, -halfBody - 0.15);
+  stick.position.set(flagBaseX, flagBaseY + 0.45, frontZ);
+  stick.rotation.z = Math.PI / 20; // лёгкий наклон
   car.add(stick);
 
-  // "Ткань" флажка — реализуем через PlaneGeometry с анимацией
+  // Треугольный флаг
+  const triW = 0.55, triH = 0.36;
+  const positions = new Float32Array([
+    0, 0, 0,
+    0, triH, 0,
+    triW, triH/2, 0.09
+  ]);
+  const indices = [0, 1, 2];
+  const flagGeo = new THREE.BufferGeometry();
+  flagGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  flagGeo.setIndex(indices);
+  flagGeo.computeVertexNormals();
+
   let flagMat;
   if (custom.carFlagType === "checkered") {
     // Клетчатая текстура
     const canvas = document.createElement('canvas');
-    canvas.width = 32; canvas.height = 22;
+    canvas.width = 32; canvas.height = 18;
     const ctx = canvas.getContext('2d');
-    for(let x=0;x<4;x++) for(let y=0;y<3;y++) {
+    for(let x=0;x<4;x++) for(let y=0;y<2;y++) {
       ctx.fillStyle = (x+y)%2===0 ? "#fff":"#222";
-      ctx.fillRect(x*8, y*8, 8, 8);
+      ctx.fillRect(x*8, y*9, 8, 9);
     }
     flagMat = new THREE.MeshPhongMaterial({
       map: new THREE.CanvasTexture(canvas),
       side: THREE.DoubleSide
     });
   } else {
-    // Обычный цвет
     flagMat = new THREE.MeshPhongMaterial({
       color: new THREE.Color(custom.carFlagColor),
       side: THREE.DoubleSide
     });
   }
 
-  // Геометрия с несколькими сегментами для "волны"
-  const flagGeo = new THREE.PlaneGeometry(0.5, 0.35, 10, 2);
   const flag = new THREE.Mesh(flagGeo, flagMat);
-  flag.position.set(-1.35, 2.20, -halfBody - 0.15);
-  flag.rotation.y = Math.PI / 9;
+  flag.position.set(flagBaseX, flagBaseY + 0.7, frontZ + 0.05);
+  flag.rotation.y = Math.PI / 1.3;
   flag.userData.isFlag = true;
   car.add(flag);
 }
@@ -765,31 +855,37 @@ if (custom.tsurikawaType !== "none") {
 }
 
 if (custom.plateText && custom.plateText.length > 0) {
+  // Белая пластина номера (опционально, для контраста)
   const plate = new THREE.Mesh(
-    new THREE.BoxGeometry(0.6, 0.18, 0.03),
+    new THREE.BoxGeometry(0.7, 0.22, 0.04),
     new THREE.MeshPhongMaterial({ color: 0xffffff })
   );
-  plate.position.set(0, 0.8, -halfBody - 0.04);
+  plate.position.set(0, 0.8, -halfBody - 0.05);
   car.add(plate);
 
+  // Текстура с номером
   const canvas = document.createElement('canvas');
-  canvas.width = 128; canvas.height = 32;
+  canvas.width = 256;
+  canvas.height = 64;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, 128, 32);
-  ctx.fillStyle = "#222";
-  ctx.font = "bold 24px monospace";
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#000";
+  ctx.font = "bold 44px monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(custom.plateText, 64, 16);
+  ctx.fillText(custom.plateText, canvas.width/2, canvas.height/2);
+
   const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
   const textMat = new THREE.MeshBasicMaterial({ map: texture, transparent:true });
+
+  // Сам текст как PlaneGeometry, чуть перед пластиной
   const textPlane = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.58, 0.15),
+    new THREE.PlaneGeometry(0.66, 0.18),
     textMat
   );
-  textPlane.position.copy(plate.position);
-  textPlane.position.z -= 0.018;
+  textPlane.position.set(0, 0.8, -halfBody - 0.072); // чуть дальше наружу, чтобы не было Z-fighting
   car.add(textPlane);
 }
 
