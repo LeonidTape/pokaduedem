@@ -83,6 +83,23 @@ for (let i = 0; i < NUM_CLOUDS; i++) {
 const camera = new THREE.PerspectiveCamera(60,1,0.1,1000);
 camera.position.set(0,5,12);
 
+// Дождь
+const rainDrops = [];
+const RAIN_COUNT = 400; // количество капель
+
+for (let i = 0; i < RAIN_COUNT; i++) {
+  const geometry = new THREE.CylinderGeometry(0.03, 0.03, 0.7, 6);
+  const material = new THREE.MeshBasicMaterial({ color: 0x66aaff, transparent: true, opacity: 0.7 });
+  const drop = new THREE.Mesh(geometry, material);
+  drop.position.set(
+    (Math.random() - 0.5) * 180,
+    Math.random() * 30 + 10,
+    (Math.random() - 0.5) * 120
+  );
+  scene.add(drop);
+  rainDrops.push(drop);
+}
+
 // Свет
 scene.add(new THREE.AmbientLight(0x444444));
 const dirLight = new THREE.DirectionalLight(0xffffff,0.5);
@@ -235,6 +252,14 @@ const NITRO_PARTICLE_INTERVAL = 0.05;
 const NITRO_COLORS = [0xAFEEEE, 0x00CED1, 0x87CEFA, 0xFFFFFF];
 const CAR_MAX_HEALTH = 100;
 let carHealth = CAR_MAX_HEALTH;
+let slowmoActive = false;
+let slowmoTimer = 0;
+let slowmoCooldown = 0;
+const SLOWMO_DURATION = 5;      // 5 секунд действия
+const SLOWMO_COOLDOWN = 10;     // 10 секунд откат
+let slowmoCharges = 1;          // изначально 1 заряд
+const slowmoBar = document.getElementById('slowmo-bar');
+const slowmoFill = document.getElementById('slowmo-fill');
 
 // Функция обновления полосы здоровья
 function updateHealthBar() {
@@ -310,6 +335,15 @@ window.addEventListener('keydown', e => {
       nitroFlightTimer = 0;
       nitroLiftExplosionFired = false;
       nitroLandExplosionFired = false;
+    }
+  }
+    if(e.code === 'Space') {
+    if (!slowmoActive && slowmoCooldown <= 0 && slowmoCharges > 0) {
+      slowmoActive = true;
+      slowmoTimer = SLOWMO_DURATION;
+      slowmoCooldown = SLOWMO_COOLDOWN;
+      slowmoCharges--;
+      slowmoBar.style.display = 'block';
     }
   }
   if(e.code === 'Escape'){
@@ -480,6 +514,12 @@ function animate(){
     });
   }
 
+  // Тормоза
+let slowmoFactor = 1;
+if (slowmoActive) slowmoFactor = 0.2; // 20% от обычной скорости
+
+const effectiveSpeed = speedFactor * (nitroActive ? 3 : 1) * slowmoFactor;
+score += 50 * effectiveSpeed * dt;
   // Растягивание в нитро
   let nitroStretch = 1;
   if (nitroActive || nitroFlight) {
@@ -619,8 +659,7 @@ function animate(){
       });
     }
   }
-  const effectiveSpeed = speedFactor * (nitroActive ? 3 : 1);
-  score += 50 * effectiveSpeed * dt;
+
   const intScore = Math.floor(score);
   scoreEl.textContent = intScore;
   if(intScore >= nextChargeThreshold){
@@ -652,17 +691,23 @@ function animate(){
     }
   }
   const cyclePos = score % CYCLE_LENGTH;
-  if(cyclePos <= DUSK_START){
-    scene.background.copy(daySkyColor);
-  } else if(cyclePos <= DUSK_END){
-    const t = (cyclePos - DUSK_START) / TRANSITION_LENGTH;
-    scene.background.copy(daySkyColor).lerp(nightSkyColor, t);
-  } else if(cyclePos <= DAWN_START){
-    scene.background.copy(nightSkyColor);
-  } else {
-    const t = (cyclePos - DAWN_START) / TRANSITION_LENGTH;
-    scene.background.copy(nightSkyColor).lerp(daySkyColor, t);
-  }
+let skyColor = new THREE.Color();
+if(cyclePos <= DUSK_START){
+  skyColor.copy(daySkyColor);
+} else if(cyclePos <= DUSK_END){
+  const t = (cyclePos - DUSK_START) / TRANSITION_LENGTH;
+  skyColor.copy(daySkyColor).lerp(nightSkyColor, t);
+} else if(cyclePos <= DAWN_START){
+  skyColor.copy(nightSkyColor);
+} else {
+  const t = (cyclePos - DAWN_START) / TRANSITION_LENGTH;
+  skyColor.copy(nightSkyColor).lerp(daySkyColor, t);
+}
+// Если идёт дождь — затемняем небо
+if (score >= 1000) {
+  skyColor.lerp(new THREE.Color(0x222233), 0.6); // 0.6 — степень затемнения
+}
+scene.background.copy(skyColor);
   if(cyclePos <= DUSK_START) starMat.opacity = 0;
   else if(cyclePos <= DUSK_END) starMat.opacity = (cyclePos - DUSK_START) / TRANSITION_LENGTH;
   else if(cyclePos <= DAWN_START) starMat.opacity = 1;
@@ -670,20 +715,34 @@ function animate(){
   starMat.needsUpdate = true;
   const cloudMoveSpeed = 1.5 * dt;
   for (let i = 0; i < clouds.length; i++) {
-    clouds[i].position.x += cloudMoveSpeed * (0.5 + Math.random());
-    if (clouds[i].position.x > 200) clouds[i].position.x = -200;
-    let tNight = 0;
-    if(cyclePos > DUSK_START && cyclePos <= DUSK_END){
-      tNight = (cyclePos - DUSK_START) / TRANSITION_LENGTH;
-    } else if(cyclePos > DUSK_END && cyclePos <= DAWN_START){
-      tNight = 1;
-    } else if(cyclePos > DAWN_START){
-      tNight = Math.max(0, 1 - (cyclePos - DAWN_START) / TRANSITION_LENGTH);
-    }
-    clouds[i].children.forEach(mesh => {
-      mesh.material.color.copy(new THREE.Color(0xffffff)).lerp(nightSkyColor, tNight);
-    });
+  clouds[i].position.x += cloudMoveSpeed * (0.5 + Math.random());
+  if (clouds[i].position.x > 200) clouds[i].position.x = -200;
+  let tNight = 0;
+  if(cyclePos > DUSK_START && cyclePos <= DUSK_END){
+    tNight = (cyclePos - DUSK_START) / TRANSITION_LENGTH;
+  } else if(cyclePos > DUSK_END && cyclePos <= DAWN_START){
+    tNight = 1;
+  } else if(cyclePos > DAWN_START){
+    tNight = Math.max(0, 1 - (cyclePos - DAWN_START) / TRANSITION_LENGTH);
   }
+  // При дожде делаем облака темнее и гуще
+  let cloudDark = 0;
+  if (score >= 1000) cloudDark = 0.7; // 0.7 — степень затемнения облаков
+  clouds[i].children.forEach(mesh => {
+    mesh.material.color.copy(new THREE.Color(0xffffff))
+      .lerp(nightSkyColor, tNight)
+      .lerp(new THREE.Color(0x222233), cloudDark);
+    mesh.material.opacity = score >= 1000 ? 0.95 : mesh.material.opacity;
+  });
+}
+if (score >= 1000 && clouds.length < 45) {
+  for (let i = clouds.length; i < 45; i++) {
+    let cloudX = (Math.random()-0.5)*380;
+    let cloudY = Math.random()*20 + 35;
+    let cloudZ = (Math.random()-0.5)*180 - 60;
+    spawnCloudCube(cloudX, cloudY, cloudZ);
+  }
+}
   let tz = 12;
   camera.position.z = THREE.MathUtils.lerp(camera.position.z, tz, dt*0.5);
   if (cyclePos <= DUSK_START || cyclePos >= DAWN_START) {
@@ -737,30 +796,30 @@ function animate(){
       scene.remove(npc);
       npCars.splice(i,1);
     } else {
-      if (!collidedWithCar && carHealth > 0) {
-        const hit = new THREE.Box3().setFromObject(car)
-          .intersectsBox(new THREE.Box3().setFromObject(npc));
-        if(hit && !nitroActive){
-          if (score < 1000) {
-            carHealth = Math.max(0, carHealth - CAR_MAX_HEALTH * 0.5);
-            updateHealthBar();
-            collidedWithCar = true;
-          } else if (score < 2000) {
-            carHealth = Math.max(0, carHealth - CAR_MAX_HEALTH * 0.9);
-            updateHealthBar();
-            collidedWithCar = true;
-          } else {
-            carHealth = 0;
-            updateHealthBar();
-            collidedWithCar = true;
-          }
-          if (carHealth <= 0) {
-            endGame();
-            return;
-          }
-          npc.position.z -= 6;
-        }
-      }
+if (!collidedWithCar && carHealth > 0) {
+  const hit = new THREE.Box3().setFromObject(car)
+    .intersectsBox(new THREE.Box3().setFromObject(npc));
+  if(hit && !nitroActive){
+    if (score < 1000) {
+      carHealth = Math.max(0, carHealth - CAR_MAX_HEALTH * 0.5);
+      updateHealthBar();
+      collidedWithCar = true;
+    } else if (score < 2000) {
+      carHealth = Math.max(0, carHealth - CAR_MAX_HEALTH * 0.9);
+      updateHealthBar();
+      collidedWithCar = true;
+    } else {
+      carHealth = 0;
+      updateHealthBar();
+      collidedWithCar = true;
+    }
+    if (carHealth <= 0) {
+      endGame();
+      return;
+    }
+    npc.position.z -= 6;
+  }
+}
     }
   }
   guardrails.forEach(g => {
@@ -808,6 +867,44 @@ function animate(){
     if(!voxels[i].update(dt)) { voxels.splice(i,1); i--; }
   }
   updateHealthBar();
+  // Дождь
+if (score >= 1000) {
+  for (let i = 0; i < rainDrops.length; i++) {
+    const drop = rainDrops[i];
+    // До 1500 очков — обычный дождь
+    if (score < 1500) {
+      drop.position.y -= 0.6 + Math.random() * 0.4;
+    } else {
+      // После 1500 очков — ливень в экран: быстрее и под углом
+      drop.position.y -= 2.5 + Math.random() * 1.5; // гораздо быстрее вниз
+      drop.position.z += 2.5 + Math.random() * 1.5; // летит "в камеру"
+      drop.position.x += (Math.random() - 0.5) * 0.2; // небольшой разброс по X
+    }
+    // Респавн капли
+    if (drop.position.y < 0 || drop.position.z > camera.position.z + 10) {
+      drop.position.y = Math.random() * 30 + 10;
+      drop.position.x = (Math.random() - 0.5) * 180;
+      drop.position.z = (Math.random() - 0.5) * 120 + camera.position.z - 60;
+    }
+  }
+}
+
+// SLOWMO таймер и прогресс-бар
+if (slowmoActive) {
+  slowmoTimer -= dt;
+  if (slowmoTimer > 0) {
+    slowmoFill.style.height = (slowmoTimer / SLOWMO_DURATION * 100) + "%";
+  } else {
+    slowmoActive = false;
+    slowmoBar.style.display = 'none';
+  }
+}
+if (slowmoCooldown > 0) {
+  slowmoCooldown -= dt;
+  if (slowmoCooldown <= 0 && slowmoCharges < 1) {
+    slowmoCharges = 1; // восстанавливаем заряд
+  }
+}
   renderer.render(scene,camera);
   requestAnimationFrame(animate);
 }
@@ -864,6 +961,27 @@ function restart(){
   shards.forEach(s => scene.remove(s.mesh)); shards=[];
   npCars.forEach(n => scene.remove(n)); npCars=[];
   voxels.forEach(v => scene.remove(v.mesh)); voxels=[];
+  // --- Удаляем капли дождя ---
+  rainDrops.forEach(drop => scene.remove(drop));
+  rainDrops.length = 0;
+  slowmoActive = false;
+  slowmoTimer = 0;
+  slowmoCooldown = 0;
+  slowmoCharges = 1;
+  slowmoBar.style.display = 'none';
+  // --- Пересоздаём дождь ---
+  for (let i = 0; i < RAIN_COUNT; i++) {
+    const geometry = new THREE.CylinderGeometry(0.03, 0.03, 0.7, 6);
+    const material = new THREE.MeshBasicMaterial({ color: 0x66aaff, transparent: true, opacity: 0.7 });
+    const drop = new THREE.Mesh(geometry, material);
+    drop.position.set(
+      (Math.random() - 0.5) * 180,
+      Math.random() * 30 + 10,
+      (Math.random() - 0.5) * 120
+    );
+    scene.add(drop);
+    rainDrops.push(drop);
+  }
   score = 0; speedFactor = 1;
   brakeHeat = 0; brakeOverheated = false; braking = false; releaseTimer = 0;
   nitroCharges = 0; nextChargeThreshold = 1000;

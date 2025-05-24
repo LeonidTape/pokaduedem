@@ -432,7 +432,16 @@ for (let i = 0; i < wheelPositions.length; i++) {
           spoiler.position.set(0,1.6+offset,-halfBody-0.2-offset*2.5);
           car.add(spoiler);
         }
-      }
+      } else if (custom.spoiler === "ducktail") {
+        // Дактейл — изогнутый спойлер
+        const ducktail = new THREE.Mesh(
+          new THREE.BoxGeometry(3, 0.12, 0.5),
+          new THREE.MeshPhongMaterial({ color: 0x444444 })
+        );
+        ducktail.position.set(0, 1.6, -halfBody-0.3);
+        ducktail.rotation.x = Math.PI / 8;
+        car.add(ducktail);
+      } 
       // Задние фонари: строго на хвосте кузова
       const brMat = new THREE.MeshBasicMaterial({ color:0x550000 });
       const f1 = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.1,0.05), brMat.clone());

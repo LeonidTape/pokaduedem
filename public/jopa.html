@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Гонка по КАДу</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="__xYzGameWrapper">
+    <canvas id="gameCanvas"></canvas>
+    <div id="hud">Счет: <span id="score">0</span> &nbsp;|&nbsp; Нитро: <span id="nitro-count">0</span></div>
+    <div id="leaderboard">
+      <h2>Таблица лидеров</h2>
+      <table>
+        <thead><tr><th>№</th><th>Имя</th><th>Счет</th></tr></thead>
+        <tbody id="lb-body"></tbody>
+      </table>
+    </div>
+    <div id="game-over">Игра окончена!<br/><span id="__xYzRestartBtn" style="text-decoration:underline;cursor:pointer;">Перезапустить</span></div>
+    <div id="nitro-bar"><div id="nitro-fill"></div></div>
+    <div id="brake-bar"><div id="brake-fill"></div></div>
+    <div id="health-bar"><div id="health-fill"></div></div>
+    <div id="slowmo-bar" style="position:absolute;left:10px;top:60px;width:16px;height:100px;background:#222;border-radius:8px;overflow:hidden;z-index:10;display:none;">
+  <div id="slowmo-fill" style="width:100%;height:100%;background:#00eaff;"></div>
+</div>
+    <div id="pause-menu">
+      <div id="pause-menu-content">
+        <div id="pause-info">
+          <label for="pause-nick" style="font-weight:700;">Ник:</label>
+          <input id="pause-nick" maxlength="20" autocomplete="off" spellcheck="false">
+          <div id="personal-record">Личный рекорд: 0</div>
+          <button id="open-custom-menu" style="position:absolute;top:90px;left:50%;transform:translateX(-50%);z-index:12;background:#2b6cff;color:#fff;padding:5px 20px;font-size:1.08em;border-radius:6px;border:none;font-weight:400;box-shadow:0 2px 8px #0004;cursor:pointer;">🚗 Кастомизация</button>
+        </div>
+        
+        <div id="pause-instructions">
+          <h3>Управление и правила:</h3>
+          <ul>
+            <li>← Влево, → Вправо</li>
+            <li>↓ Тормоз (может перегреться)</li>
+            <li>↑ Нитро (накапливается за счет очков)</li>
+            <li>Esc Пауза</li>
+          </ul>
+          <li>
+            Цель: набрать максимальный счет, избегая столкновений и препятствий.<br>
+            Избегайте других машин.<br>
+            Третесь об отбойник - теряется здоровье.<br>
+            При прохождении более 1000 очков игра усложняется.
+          </li>
+        </div>
+        <button id="continue-btn">Продолжить</button>
+      </div>
+    </div>
+    <div id="countdown-overlay"></div>
+<div id="custom-menu">
+  <button id="custom-close-btn" title="Закрыть">&times;</button>
+  <h2>Кастомизация машины</h2>
+  <div id="custom-content">
+    <!-- Левая колонка: миниатюра -->
+    <div id="preview-container">
+      <div id="custom-car-preview"></div>
+    </div>
+    <!-- Правая колонка: поля и кнопка -->
+    <div id="fields-container">
+      <div class="custom-field">
+        <label for="color-body">Цвет кузова:</label>
+        <div class="custom-color"><input type="color" id="color-body"></div>
+      </div>
+      <div class="custom-field">
+        <label for="color-cab">Цвет стекол:</label>
+        <div class="custom-color"><input type="color" id="color-cab"></div>
+      </div>
+      <div class="custom-field">
+        <label for="color-wheels">Цвет колес:</label>
+        <div class="custom-color"><input type="color" id="color-wheels"></div>
+      </div>
+      <div class="custom-field">
+        <label for="wheel-camber">Развал колес (градусы):</label>
+        <input type="range" id="wheel-camber" min="-15" max="15" step="1">
+        <span id="wheel-camber-value"></span>
+      </div>
+      <div class="custom-field">
+        <label for="spoiler-type">Тип спойлера:</label>
+        <select class="custom-select" id="spoiler-type">
+          <option value="none">Без спойлера</option>
+          <option value="classic">Классика</option>
+          <option value="big">Большой</option>
+          <option value="double">Двойной</option>
+          <option value="ducktail">Дактейл</option>
+        </select>
+      </div>
+      <div class="custom-field">
+        <label for="car-flag-color">Цвет флажка:</label>
+        <input type="color" id="car-flag-color" value="#ff0000" style="width:38px;">
+        <select class="custom-select" id="car-flag-type" style="margin-left:8px;">
+          <option value="none">Нет</option>
+          <option value="solid">Обычный</option>
+          <option value="checkered">Клетчатый</option>
+        </select>
+      </div>
+      <div class="custom-field">
+        <label for="tsurikawa-color">Цвет цурикавы:</label>
+        <input type="color" id="tsurikawa-color" value="#ffffff" style="width:38px;">
+        <select class="custom-select" id="tsurikawa-type" style="margin-left:8px;">
+          <option value="none">Нет</option>
+          <option value="circle">Круглая</option>
+          <option value="star">Звездочка</option>
+          <option value="heart">Сердечко</option>
+        </select>
+      </div>
+      <div class="custom-field">
+        <label for="plate-text">Номер (до 6 символов):</label>
+        <input type="text" id="plate-text" maxlength="6" style="width:90px;">
+      </div>
+      <div class="custom-field">
+        <label for="body-length">Длина кузова:</label>
+        <input type="range" id="body-length" min="3" max="8" step="0.1">
+        <span id="body-length-value"></span>
+      </div>
+      <div class="custom-field">
+        <label for="cab-length">Длина кабины:</label>
+        <input type="range" id="cab-length" min="2" max="5" step="0.1">
+        <span id="cab-length-value"></span>
+      </div>
+      <button id="custom-save-btn">Сохранить</button>
+    </div>
+  </div>
+</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+
+<div id="music-player">
+  <img id="track-cover" class="cover" src="https://i.imgur.com/0y8Ftya.jpg" alt="Обложка">
+  <div id="track-title" style="margin-bottom:8px;font-size:15px;">Трек 1</div>
+  <audio id="audio" src="https://getfile.dokpub.com/yandex/get/https://disk.yandex.com/d/uD2c5f94EuIlTg"></audio>
+  <div style="margin-bottom:8px;">
+    <button id="prev-btn">⏮️</button>
+    <button id="play-btn">▶️</button>
+    <button id="pause-btn" style="display:none;">⏸️</button>
+    <button id="next-btn">⏭️</button>
+  </div>
+  <div>
+    <label style="font-size:12px;">Громкость</label>
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.7" style="vertical-align:middle;">
+  </div>
+</div>
+
+  <script src="../src/customization.js"></script>
+  <script src="../src/leaderboard.js"></script>
+  <script src="../src/music-player.js"></script>
+  <script type="module" src="../src/main.js"></script>
+
+</body>
+</html>
