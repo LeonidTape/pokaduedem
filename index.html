@@ -22,6 +22,9 @@
     <div id="nitro-bar"><div id="nitro-fill"></div></div>
     <div id="brake-bar"><div id="brake-fill"></div></div>
     <div id="health-bar"><div id="health-fill"></div></div>
+    <div id="slowmo-bar" style="position:absolute;left:10px;top:60px;width:16px;height:100px;background:#222;border-radius:8px;overflow:hidden;z-index:10;display:none;">
+  <div id="slowmo-fill" style="width:100%;height:100%;background:#00eaff;"></div>
+</div>
     <div id="pause-menu">
       <div id="pause-menu-content">
         <div id="pause-info">
@@ -80,10 +83,11 @@
       <div class="custom-field">
         <label for="spoiler-type">Тип спойлера:</label>
         <select class="custom-select" id="spoiler-type">
-          <option value="classic">Классический</option>
           <option value="none">Без спойлера</option>
+          <option value="classic">Классика</option>
           <option value="big">Большой</option>
           <option value="double">Двойной</option>
+          <option value="ducktail">Дактейл</option>
         </select>
       </div>
       <div class="custom-field">
